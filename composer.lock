@@ -1,0 +1,102 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "2f17e5b3a2e43dd14ecff7731de0b114",
+    "packages": [
+        {
+            "name": "cl/cirsim-php",
+            "version": "v1.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/charles-owen/cirsim-php.git",
+                "reference": "420c70bfa4e9c6b2e749c478e0aa7e3714c0d166"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/charles-owen/cirsim-php/zipball/420c70bfa4e9c6b2e749c478e0aa7e3714c0d166",
+                "reference": "420c70bfa4e9c6b2e749c478e0aa7e3714c0d166",
+                "shasum": ""
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "CL\\CirsimPHP\\": "src/CirsimPHP"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Charles B. Owen",
+                    "email": "cbowen@msu.edu"
+                }
+            ],
+            "description": "Cirsim server-side PHP support.",
+            "support": {
+                "source": "https://github.com/charles-owen/cirsim-php/tree/v1.1.2",
+                "issues": "https://github.com/charles-owen/cirsim-php/issues"
+            },
+            "time": "2021-01-05T21:54:58+00:00"
+        },
+        {
+            "name": "cl/kmap-php",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/charles-owen/kmap-php.git",
+                "reference": "9c8643841b4ed3bd96c5b5813f93536c138b2404"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/charles-owen/kmap-php/zipball/9c8643841b4ed3bd96c5b5813f93536c138b2404",
+                "reference": "9c8643841b4ed3bd96c5b5813f93536c138b2404",
+                "shasum": ""
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "CL\\KmapPHP\\": "src/KmapPHP"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Charles B. Owen",
+                    "email": "cbowen@msu.edu"
+                }
+            ],
+            "description": "Kmap server-side PHP support.",
+            "support": {
+                "issues": "https://github.com/charles-owen/kmap-php/issues",
+                "source": "https://github.com/charles-owen/kmap-php/tree/v1.0.0"
+            },
+            "time": "2021-01-17T20:23:37+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": [],
+    "plugin-api-version": "2.0.0"
+}
