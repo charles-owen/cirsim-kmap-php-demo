@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0, minimum-scale=1" name="viewport">
+    <title>Building Cirsim and Kmap</title>
+</head>
+<body>
+
+<h1>Building Cirsim and Kmap</h1>
+
+
+
+<p>To build Cirsim and Kmap you will need to have Node.js installed. To add the dependencies, use this command:</p>
+<pre class="code">npm install
+</pre>
+<p>Then to build:</p>
+<pre class="code">npm run build:all
+</pre>
+<p>This will build both the development and distribution versions. If you want to build only the development version (build.js):</p>
+<pre class="code">npm run build:dev</pre>
+<p>For only the production version:</p>
+<pre class="code">npm run build:prod</pre>
+<p>Support is included for running the development server and hot-swapping. You will need to edit webpack.dev.js and change the host name you are using. I used cirsim.localhost. </p>
+<p>THere is a file cirsim.inc.php that is included in &lt;head&gt; of all of the demonstrations. It uses dist/build.js if it is present and the CDN if it is not.</p>
+<pre class="code">&lt;?php
+if(file_exists(__DIR__ . '/../dist/build.js')) {
+    echo &lt;&lt;&lt;HTML
+&lt;script src="dist/build.js"&gt;&lt;/script&gt;
+HTML;
+} else {
+    echo &lt;&lt;&lt;HTML
+&lt;script src="https://unpkg.com/cirsim/dist/cirsim.min.js"&gt;&lt;/script&gt;
+&lt;script src="https://unpkg.com/kmap/dist/kmap.min.js"&gt;&lt;/script&gt;
+HTML;
+}</pre>
+<p></p>
+</body>
+</html>

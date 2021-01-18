@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0, minimum-scale=1" name="viewport">
+    <title>Cirsim and Kmap Demonstration Instructions</title>
+</head>
+<body>
+
+<h1>Cirsim and Kmap Demonstration</h1>
+<p>This is a demonstration of how to use Cirsim and Kmap from PHP. It shows how to use the PHP support classes from cl/cirsim-php and cl/kmap-php and how to adapt them to include instructor support. It also demonstrates the API support needed.</p>
+<p>Note that if you use these classes, I can usually provide PHP for every usage and you can just paste it in.</p>
+<h2>Installation and Startup</h2>
+<p>To run the demo, first do <code>composer install</code> to install the PHP dependencies. It will install cl/cirsim-php and cl/kmap-php. The program is uses the Javascript components from the unpkg CDN. Instructions are included in the file <a href="doc/building.html">doc/building.html</a> if you want to build Cirsim and Kmap into a single build.js file instead of using the CDN. It also gives an illustration of how to use Cirsim and Kmap from webpack. </p>
+<p>The program assumes some PHP server hosting. I host using Xampp when working on this code. This will not work without some sort of server.</p>
+<h2>cl/cirsim and \CL\CirsimPHP\Cirsim()</h2>
+<p>There is a Composer package cl/cirsim that provides a PHP class that makes it easier to use Cirsim in PHP code. The class is \CL\CirsimPHP\Cirsim(). It can be configured using properties and can then spit out the appropriate configured &lt;div&gt; to utilize Cirsim. </p>
+<p>It can be used alone for inline demonstrations. For example, this is how an inline demonstration can be included on a page:</p>
+<pre class="code">&lt;?php
+$cirsim = new CL\CirsimPHP\Cirsim();
+$json = '{"grid":8,"sn...0,"bends":[]}]}]}';
+echo $cirsim-&gt;present_demo($json);
+?&gt;</pre>
+<p>The Json is the output of the Cirsim export function. I have deleted much of it here. For a full example, see index.php. </p>
+<p>Since there are site-specific configuration, such as defining API paths, it makes sense to create an adapter class that configures the Cirsim class. An example inheritance adapter can be found in lib/Demo/CirsimDemo.php. It sets the example API paths and demonstrates how to enable solutions and import/export only for instructors. </p>
+<h2>Inline Cirsim</h2>
+<p>A common use for Cirsim is inline demonstrations. Two examples can be found in index.php. The first uses the Cirsim class directly. The second uses the adapter class. </p>
+<h2>Save/Load file capability</h2>
+<p>To demonstrate the API's the first example in the file save-load.php (Save/Load Demo in the menu) implements the full save/load API functionality:</p>
+<pre class="code">&lt;?php
+$cirsim = new Demo\CirsimDemo($instructor, $apiDemo);
+echo $cirsim-&gt;present();
+?&gt;</pre>
+<p>This is very simple since all of the setup is done in CirsimDemo. $instructor is true for instructors and is implemented with a very simple form on the page. $apiDemo is a class that is stored in the PHP Session that pretends to be  persistent storage. </p>
+<p><em>Note that you may not need to implement full Files/Save/Load capability. I have it in my existing website for students to use. They rarely ever use it. Most all usage uses the Single Save functionality described below. Both save and load api endpoints are needed for Single Save. The files endpoint is not. </em></p>
+<h3>Save</h3>
+<p>The file api/save.php demonstrates a simple save API endpoint. When a user does File&gt;Save As, these values are sent via POST: </p>
+<ul>
+  <li>appTag - An application tag that defines the usage</li>
+  <li>name - A file name to save as</li>
+  <li>data - The Cirsim file (JSON)</li>
+  <li>type - application/json</li>
+</ul>
+<p>A file for a given user is identified using an application tag and a name. For example, here I used &quot;general&quot; as the application tag. The main reason for this in my systems is to identify the assignment (chapter). For example, I might use &quot;circuit3&quot; as an application tag for Circuit Assignment 3 and &quot;quiz3&quot; as a name. </p>
+<p>The response from the server is in the <a href="https://jsonapi.org/">JSON API </a>format. That will be empty on success {} and an error in the JSON API format if there is a server error. I have included a simple JsonAPI class in lib/Demo that is used to generate the responses.</p>
+<p>A main use for the appTag is to turn off saving when an assignment is expired (unless you want to do late submissions). I allow loading from expired assignments, but not saving. The save API returns an error message that the assignment is closed.</p>
+<h3>Load</h3>
+<p>The file api/load.php demonstrates a simple load API endpoint. To load, the API expects these values via GET:</p>
+<ul>
+  <li>appTag - An application tag that defines the usage</li>
+  <li>name - A file name to save as</li>
+</ul>
+<p>The result is a Cirsim file added to JSON API with the type 'file-data'. </p>
+<h3>Files</h3>
+<p>The file api/files.php implements getting a list of files. For both Save and Load, Cirsim presents a list of files that already exist. The API receives only an appTag and returns an array of objects, with 'name' as a label and the filename. Here is the code that generates the list:</p>
+<pre class="code">       $result = [];
+       foreach($this-&gt;files[$appTag] as $fileName =&gt; $data) {
+            $result[] = ['name'=&gt;$fileName];
+       }</pre>
+<p>It may not be necessary to create this endpoint.</p>
+<h3>Extensions</h3>
+<p>It is possible to add extra content that will be included with the API operations. For example, an instructor may need to load the file for a student. In that case, extra data can be added that will appear in the load API call. For example:</p>
+<p>$cirsim-&gt;api-&gt;addExtra('student-id', 123); </p>
+<p>The load API will receive an extra GET value for load of 'student-id'.</p>
+<h2>Single Save</h2>
+<p>The most common usage for Cirsim is single save. The means Cirsim appears persistent to the student. They have a Save, but do not select the filename, since it is fixed. </p>
+<p>The second example in save-load is a single save example. Create a simple circuit (or if in instructor mode, File&gt;Load Solution to load one). Then File&gt;Save. When the page is reloaded, the same circuit appears. </p>
+<p>Setting up single save is doing like this:</p>
+<pre class="code">&lt;?php
+$cirsim = new Demo\CirsimDemo($instructor, $apiDemo);
+$cirsim-&gt;single('circuit2', 'quiz3');
+echo $cirsim-&gt;present();
+?&gt;</pre>
+
+<p><em>I omitted the $cirsim->answer= here. It can be seen in save-load.php and is an example of how answers can be added for instructors.</em></p>
+<p>Single save uses the save endpoint. It can be set to use the load endpoint, but a better choice is what the CirsimDemo class does: include the loaded circuit in the &lt;div&gt; do it appears instantly without a delayed load. </p>
+<h2>Testing</h2>
+<p>The page testing.php (Testing Demo) is an example test and how a quiz would work. The code in testing.php sets up Cirsim with a test. Again, this is something I can supply. When the test is run, the endpoint simulated by api/test.php is contacted with these POST values:</p>
+<ul>
+  <li>appTag - The application tag</li>
+  <li>name - The filename. (tests are always doing on single save instances)</li>
+  <li>result - 'success' or 'fail'</li>
+  <li>data - The Cirsim file the test ran on</li>
+  <li>type - 'application/json'</li>
+</ul>
+<p>The Cirsim file should be saved as an audit mechanism. Students could hack the Javascript and send 'success'. But, if I suspect that, I just look at the Cirsim they submitted. If it doesn't pass tests, well there you go. </p>
+<p>The demo has a page that displays the test results, so you can see how this works.</p>
+<h2>Tab Import</h2>
+<p>A focus of this course is abstraction. Students will sometimes build one thing and then use that thing to build something else. The page import.php (Cirsim Tab Import) demonstrates the tab importing mechanism. A student builds a circuit in the first Cirsim instances on the page. In instructor mode you can actually load this circuit and run the tests. The second instance on the page is another assignment. Click on the adder tab and choose File&gt;Import Tab to import the adder tab contents from the other circuit. The PHP to set up for importing is:</p>
+<pre class="code">$cirsim-&gt;tab_import("adder", 			// Tab to import into
+    "circuit4", 		// Assignment to import from
+    "adder",	// Name (quiz question filename)
+    "adder"				// Tab to import from
+);</pre>
+<p>These examples also demonstrate other features of Cirsim including fixed tabs and specified components. </p>
+<h2>cl/kmap and \CL\KmapPHP\Kmap</h2>
+<p>The Karnaugh Map editor is configured in exactly the same way. There is a PHP helper class \CL\KmapPHP\Kmap and I have created an adapter for it named \Demo\KmapDemo. The demonstrations on the page Kmap Demonstration (kmap.php) how how to present the editor using the classes. </p>
+<h3>Testing</h3>
+<p>The page kmap-test.php (Karnaugh Map Test) is how a quiz might work. The solution for this quiz is X'. Enter that where it says Enter Expression and click Check. This will pass the test and send the result to the API test endpoint. This is exactly the same endpoint used for Cirsim and is used in the same way. The only difference is the file contains the Karnaugh map configuration and submitted student answer.</p>
+</body>
+</html>
